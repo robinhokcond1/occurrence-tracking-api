@@ -1,8 +1,8 @@
-package com.carbigdata.br.occurrencetrackingapi.services;
+package com.carbigdata.br.occurrencetrackingapi.service;
 
 import com.carbigdata.br.occurrencetrackingapi.dto.ClienteDTO;
-import com.carbigdata.br.occurrencetrackingapi.entities.Cliente;
-import com.carbigdata.br.occurrencetrackingapi.repositories.ClienteRepository;
+import com.carbigdata.br.occurrencetrackingapi.entity.ClienteEntity;
+import com.carbigdata.br.occurrencetrackingapi.repository.ClienteRepository;
 import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,11 +18,11 @@ public class ClienteService {
     private ClienteRepository clienteRepository;
 
     public ClienteDTO criarCliente(ClienteDTO clienteDTO) {
-        Cliente cliente = new Cliente();
+        ClienteEntity cliente = new ClienteEntity();
         cliente.setNome(clienteDTO.getNome());
         cliente.setCpf(clienteDTO.getCpf());
         cliente.setDataNascimento(clienteDTO.getDataNascimento());
-        Cliente novoCliente = clienteRepository.save(cliente);
+        ClienteEntity novoCliente = clienteRepository.save(cliente);
         return DtoConverter.toClienteDTO(novoCliente);
     }
 

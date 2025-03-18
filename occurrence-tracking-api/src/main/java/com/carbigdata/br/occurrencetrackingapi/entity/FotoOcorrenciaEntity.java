@@ -1,4 +1,4 @@
-package com.carbigdata.br.occurrencetrackingapi.entities;
+package com.carbigdata.br.occurrencetrackingapi.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -14,16 +14,16 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FotoOcorrencia {
+public class FotoOcorrenciaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cod_foto_ocorrencia")
-    private Long codFotOcorrencia;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "cod_ocorrencia", nullable = false)
-    private Ocorrencia ocorrencia;
+    private OcorrenciaEntity ocorrencia;
 
     @Column(name = "dta_criacao",nullable = false)
     private LocalDateTime dataCriacao;

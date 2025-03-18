@@ -1,8 +1,8 @@
-package com.carbigdata.br.occurrencetrackingapi.services;
+package com.carbigdata.br.occurrencetrackingapi.service;
 
 import com.carbigdata.br.occurrencetrackingapi.dto.EnderecoDTO;
-import com.carbigdata.br.occurrencetrackingapi.entities.Endereco;
-import com.carbigdata.br.occurrencetrackingapi.repositories.EnderecoRepository;
+import com.carbigdata.br.occurrencetrackingapi.entity.EnderecoEntity;
+import com.carbigdata.br.occurrencetrackingapi.repository.EnderecoRepository;
 import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,14 +18,14 @@ public class EnderecoService {
     private EnderecoRepository enderecoRepository;
 
     public EnderecoDTO salvarEndereco(EnderecoDTO enderecoDTO) {
-        Endereco endereco = new Endereco();
+        EnderecoEntity endereco = new EnderecoEntity();
         endereco.setLogradouro(enderecoDTO.getLogradouro());
         endereco.setBairro(enderecoDTO.getBairro());
         endereco.setCep(enderecoDTO.getCep());
         endereco.setCidade(enderecoDTO.getCidade());
         endereco.setEstado(enderecoDTO.getEstado());
 
-        Endereco novoEndereco = enderecoRepository.save(endereco);
+        EnderecoEntity novoEndereco = enderecoRepository.save(endereco);
         return DtoConverter.toEnderecoDTO(novoEndereco);
     }
 

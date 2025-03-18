@@ -1,8 +1,8 @@
-package com.carbigdata.br.occurrencetrackingapi.services;
+package com.carbigdata.br.occurrencetrackingapi.service;
 
 import com.carbigdata.br.occurrencetrackingapi.dto.FotoOcorrenciaDTO;
-import com.carbigdata.br.occurrencetrackingapi.entities.FotoOcorrencia;
-import com.carbigdata.br.occurrencetrackingapi.repositories.FotoOcorrenciaRepository;
+import com.carbigdata.br.occurrencetrackingapi.entity.FotoOcorrenciaEntity;
+import com.carbigdata.br.occurrencetrackingapi.repository.FotoOcorrenciaRepository;
 import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,8 +17,8 @@ public class FotoOcorrenciaService {
     @Autowired
     private FotoOcorrenciaRepository fotoOcorrenciaRepository;
 
-    public FotoOcorrenciaDTO salvarFoto(FotoOcorrencia fotoOcorrencia) {
-        FotoOcorrencia novaFoto = fotoOcorrenciaRepository.save(fotoOcorrencia);
+    public FotoOcorrenciaDTO salvarFoto(FotoOcorrenciaEntity fotoOcorrencia) {
+        FotoOcorrenciaEntity novaFoto = fotoOcorrenciaRepository.save(fotoOcorrencia);
         return DtoConverter.toFotoOcorrenciaDTO(novaFoto);
     }
 
