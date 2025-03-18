@@ -1,6 +1,6 @@
-package com.carbigdata.br.occurrencetrackingapi.entities;
+package com.carbigdata.br.occurrencetrackingapi.entity;
 
-import com.carbigdata.br.occurrencetrackingapi.enums.StatusOcorrencia;
+import com.carbigdata.br.occurrencetrackingapi.enums.StatusOcorrenciaEnum;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,8 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "ocorrencia")
@@ -17,26 +15,26 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Ocorrencia {
+public class OcorrenciaEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cod_ocorrencia")
-    private Long codOcorrenciaId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "cod_cliente", nullable = false)
-    private Cliente cliente;
+    private ClienteEntity cliente;
 
     @ManyToOne
     @JoinColumn(name = "cod_endereco", nullable = false)
-    private Endereco endereco;
+    private EnderecoEntity endereco;
 
     @Column(name = "dta_ocorrencia", nullable = false)
     private LocalDateTime dataOcorrencia;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "sta_ocorrencia", nullable = false)
-    private StatusOcorrencia statusOcorrencia;
+    private StatusOcorrenciaEnum statusOcorrencia;
 
 }

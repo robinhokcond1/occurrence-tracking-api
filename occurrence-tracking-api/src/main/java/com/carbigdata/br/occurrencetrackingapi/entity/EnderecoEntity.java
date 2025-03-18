@@ -1,4 +1,4 @@
-package com.carbigdata.br.occurrencetrackingapi.entities;
+package com.carbigdata.br.occurrencetrackingapi.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -12,12 +12,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Endereco {
+public class EnderecoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cod_endereco")
-    private Long codEndercoId;
+    private Long id;
 
     @Column(name = "nme_logradouro")
     private String logradouro;

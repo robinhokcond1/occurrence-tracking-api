@@ -1,14 +1,14 @@
-package com.carbigdata.br.occurrencetrackingapi.services;
+package com.carbigdata.br.occurrencetrackingapi.service;
 
 import com.carbigdata.br.occurrencetrackingapi.dto.OcorrenciaCreateDTO;
 import com.carbigdata.br.occurrencetrackingapi.dto.OcorrenciaDTO;
-import com.carbigdata.br.occurrencetrackingapi.entities.Cliente;
-import com.carbigdata.br.occurrencetrackingapi.entities.Endereco;
-import com.carbigdata.br.occurrencetrackingapi.entities.Ocorrencia;
-import com.carbigdata.br.occurrencetrackingapi.enums.StatusOcorrencia;
-import com.carbigdata.br.occurrencetrackingapi.repositories.ClienteRepository;
-import com.carbigdata.br.occurrencetrackingapi.repositories.EnderecoRepository;
-import com.carbigdata.br.occurrencetrackingapi.repositories.OcorrenciaRepository;
+import com.carbigdata.br.occurrencetrackingapi.entity.ClienteEntity;
+import com.carbigdata.br.occurrencetrackingapi.entity.EnderecoEntity;
+import com.carbigdata.br.occurrencetrackingapi.entity.OcorrenciaEntity;
+import com.carbigdata.br.occurrencetrackingapi.enums.StatusOcorrenciaEnum;
+import com.carbigdata.br.occurrencetrackingapi.repository.ClienteRepository;
+import com.carbigdata.br.occurrencetrackingapi.repository.EnderecoRepository;
+import com.carbigdata.br.occurrencetrackingapi.repository.OcorrenciaRepository;
 import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,18 +30,18 @@ public class OcorrenciaService {
     private EnderecoRepository enderecoRepository;
 
     public OcorrenciaDTO registrarOcorrencia(OcorrenciaCreateDTO dto) {
-        Cliente cliente = clienteRepository.findById(dto.getClienteId())
+        ClienteEntity cliente = clienteRepository.findById(dto.getClienteId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-        Endereco endereco = enderecoRepository.findById(dto.getEnderecoId())
+        EnderecoEntity endereco = enderecoRepository.findById(dto.getEnderecoId())
                 .orElseThrow(() -> new RuntimeException("Endereço não encontrado"));
 
-        Ocorrencia ocorrencia = new Ocorrencia();
+        OcorrenciaEntity ocorrencia = new OcorrenciaEntity();
         ocorrencia.setCliente(cliente);
         ocorrencia.setEndereco(endereco);
         ocorrencia.setDataOcorrencia(dto.getDataOcorrencia());
-        ocorrencia.setStatusOcorrencia(StatusOcorrencia.ATIVO);
+        ocorrencia.setStatusOcorrencia(StatusOcorrenciaEnum.ATIVO);
 
-        Ocorrencia ocorrenciaSalva = ocorrenciaRepository.save(ocorrencia);
+        OcorrenciaEntity ocorrenciaSalva = ocorrenciaRepository.save(ocorrencia);
         return DtoConverter.toOcorrenciaDTO(ocorrenciaSalva);
     }
 
@@ -58,11 +58,11 @@ public class OcorrenciaService {
     }
 
     public OcorrenciaDTO finalizarOcorrencia(Long id) {
-        Ocorrencia ocorrencia = ocorrenciaRepository.findById(id)
+        OcorrenciaEntity ocorrencia = ocorrenciaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ocorrência não encontrada"));
 
-        ocorrencia.setStatusOcorrencia(StatusOcorrencia.FINALIZADA);
-        Ocorrencia ocorrenciaAtualizada = ocorrenciaRepository.save(ocorrencia);
+        ocorrencia.setStatusOcorrencia(StatusOcorrenciaEnum.FINALIZADA);
+        OcorrenciaEntity ocorrenciaAtualizada = ocorrenciaRepository.save(ocorrencia);
         return DtoConverter.toOcorrenciaDTO(ocorrenciaAtualizada);
     }
 }

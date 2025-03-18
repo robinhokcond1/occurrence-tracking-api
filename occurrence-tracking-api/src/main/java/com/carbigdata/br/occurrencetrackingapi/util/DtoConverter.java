@@ -1,22 +1,22 @@
 package com.carbigdata.br.occurrencetrackingapi.util;
 
 import com.carbigdata.br.occurrencetrackingapi.dto.*;
-import com.carbigdata.br.occurrencetrackingapi.entities.*;
+import com.carbigdata.br.occurrencetrackingapi.entity.*;
 
 public class DtoConverter {
 
-    public static ClienteDTO toClienteDTO(Cliente cliente) {
+    public static ClienteDTO toClienteDTO(ClienteEntity cliente) {
         ClienteDTO dto = new ClienteDTO();
-        dto.setId(cliente.getCodClienteId());
+        dto.setId(cliente.getId());
         dto.setNome(cliente.getNome());
         dto.setCpf(cliente.getCpf());
         dto.setDataNascimento(cliente.getDataNascimento());
         return dto;
     }
 
-    public static EnderecoDTO toEnderecoDTO(Endereco endereco) {
+    public static EnderecoDTO toEnderecoDTO(EnderecoEntity endereco) {
         EnderecoDTO dto = new EnderecoDTO();
-        dto.setId(endereco.getCodEndercoId());
+        dto.setId(endereco.getId());
         dto.setLogradouro(endereco.getLogradouro());
         dto.setBairro(endereco.getBairro());
         dto.setCep(endereco.getCep());
@@ -25,9 +25,9 @@ public class DtoConverter {
         return dto;
     }
 
-    public static OcorrenciaDTO toOcorrenciaDTO(Ocorrencia ocorrencia) {
+    public static OcorrenciaDTO toOcorrenciaDTO(OcorrenciaEntity ocorrencia) {
         OcorrenciaDTO dto = new OcorrenciaDTO();
-        dto.setId(ocorrencia.getCodOcorrenciaId());
+        dto.setId(ocorrencia.getId());
         dto.setCliente(toClienteDTO(ocorrencia.getCliente()));
         dto.setEndereco(toEnderecoDTO(ocorrencia.getEndereco()));
         dto.setDataOcorrencia(ocorrencia.getDataOcorrencia());
@@ -35,9 +35,9 @@ public class DtoConverter {
         return dto;
     }
 
-    public static FotoOcorrenciaDTO toFotoOcorrenciaDTO(FotoOcorrencia foto) {
+    public static FotoOcorrenciaDTO toFotoOcorrenciaDTO(FotoOcorrenciaEntity foto) {
         FotoOcorrenciaDTO dto = new FotoOcorrenciaDTO();
-        dto.setId(foto.getCodFotOcorrencia());
+        dto.setId(foto.getId());
         dto.setPathBucket(foto.getDscPathBucket());
         dto.setHash(foto.getDscHash());
         return dto;

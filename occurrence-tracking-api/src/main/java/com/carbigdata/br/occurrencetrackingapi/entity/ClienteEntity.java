@@ -1,4 +1,4 @@
-package com.carbigdata.br.occurrencetrackingapi.entities;
+package com.carbigdata.br.occurrencetrackingapi.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Cliente {
+public class ClienteEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cod_cliente")
-    private Long codClienteId;
+    private Long id;
 
     @Column(name = "nme_cliente", length = 50, nullable = false)
     private String nome;

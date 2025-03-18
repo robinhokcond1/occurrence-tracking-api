@@ -1,6 +1,6 @@
 package com.carbigdata.br.occurrencetrackingapi.dto;
 
-import com.carbigdata.br.occurrencetrackingapi.enums.StatusOcorrencia;
+import com.carbigdata.br.occurrencetrackingapi.enums.StatusOcorrenciaEnum;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,5 +13,5 @@ public class OcorrenciaDTO {
     private ClienteDTO cliente;
     private EnderecoDTO endereco;
     private LocalDateTime dataOcorrencia;
-    private StatusOcorrencia statusOcorrencia;
+    private StatusOcorrenciaEnum statusOcorrencia;
 }

@@ -1,6 +1,6 @@
 package com.carbigdata.br.occurrencetrackingapi.enums;
 
-public enum StatusOcorrencia {
+public enum StatusOcorrenciaEnum {
     ATIVO,
     FINALIZADA
 }
