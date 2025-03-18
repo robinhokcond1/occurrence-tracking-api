@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "foto_ocorrencia")
 @Getter
@@ -17,14 +19,14 @@ public class FotoOcorrencia {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "cod_foto_ocorrencia")
-    private String codFotOcorrencia;
+    private Long codFotOcorrencia;
 
     @ManyToOne
     @JoinColumn(name = "cod_ocorrencia", nullable = false)
     private Ocorrencia ocorrencia;
 
     @Column(name = "dta_criacao",nullable = false)
-    private String dataCriacao;
+    private LocalDateTime dataCriacao;
 
     @Column(name = "dsc_path_bucket", nullable = false)
     private String dscPathBucket;

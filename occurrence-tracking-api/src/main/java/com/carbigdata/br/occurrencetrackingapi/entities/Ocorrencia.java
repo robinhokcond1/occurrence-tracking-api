@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "ocorrencia")
@@ -30,10 +32,11 @@ public class Ocorrencia {
     @JoinColumn(name = "cod_endereco", nullable = false)
     private Endereco endereco;
 
-    @Column(name = "dta_ocorrencia")
+    @Column(name = "dta_ocorrencia", nullable = false)
     private LocalDateTime dataOcorrencia;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "sta_ocorrencia")
+    @Column(name = "sta_ocorrencia", nullable = false)
     private StatusOcorrencia statusOcorrencia;
+
 }
