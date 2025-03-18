@@ -3,6 +3,8 @@ package com.carbigdata.br.occurrencetrackingapi.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "cliente")
 @Getter
@@ -19,12 +21,12 @@ public class Cliente {
     private String nome;
 
     @Column(name = "dta_nascimento")
-    private String dataNascimento;
+    private LocalDateTime dataNascimento;
 
     @Column(name = "nro_cpf",nullable = false)
     private String cpf;
 
     @Column(name = "dta_criacao",nullable = false)
-    private String dataCriacao;
+    private LocalDateTime dataCriacao;
 
 }
