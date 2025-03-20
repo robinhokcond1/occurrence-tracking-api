@@ -11,11 +11,12 @@ import com.carbigdata.br.occurrencetrackingapi.repository.EnderecoRepository;
 import com.carbigdata.br.occurrencetrackingapi.repository.OcorrenciaRepository;
 import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.time.LocalDate;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class OcorrenciaService {
@@ -41,28 +42,27 @@ public class OcorrenciaService {
         ocorrencia.setDataOcorrencia(dto.getDataOcorrencia());
         ocorrencia.setStatusOcorrencia(StatusOcorrenciaEnum.ATIVO);
 
-        OcorrenciaEntity ocorrenciaSalva = ocorrenciaRepository.save(ocorrencia);
-        return DtoConverter.toOcorrenciaDTO(ocorrenciaSalva);
+        return DtoConverter.toOcorrenciaDTO(ocorrenciaRepository.save(ocorrencia));
     }
 
-    public List<OcorrenciaDTO> listarOcorrencias() {
-        return ocorrenciaRepository.findAll()
-                .stream()
-                .map(DtoConverter::toOcorrenciaDTO)
-                .collect(Collectors.toList());
+    public Page<OcorrenciaDTO> listarOcorrencias(StatusOcorrenciaEnum status, Pageable pageable) {
+        return ocorrenciaRepository.findByStatusOcorrencia(status, pageable)
+                .map(DtoConverter::toOcorrenciaDTO);
     }
 
     public Optional<OcorrenciaDTO> buscarPorId(Long id) {
-        return ocorrenciaRepository.findById(id)
-                .map(DtoConverter::toOcorrenciaDTO);
+        return ocorrenciaRepository.findById(id).map(DtoConverter::toOcorrenciaDTO);
     }
 
     public OcorrenciaDTO finalizarOcorrencia(Long id) {
         OcorrenciaEntity ocorrencia = ocorrenciaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Ocorrência não encontrada"));
 
+        if (ocorrencia.getStatusOcorrencia() == StatusOcorrenciaEnum.FINALIZADA) {
+            throw new RuntimeException("Ocorrência já foi finalizada e não pode ser alterada.");
+        }
+
         ocorrencia.setStatusOcorrencia(StatusOcorrenciaEnum.FINALIZADA);
-        OcorrenciaEntity ocorrenciaAtualizada = ocorrenciaRepository.save(ocorrencia);
-        return DtoConverter.toOcorrenciaDTO(ocorrenciaAtualizada);
+        return DtoConverter.toOcorrenciaDTO(ocorrenciaRepository.save(ocorrencia));
     }
 }

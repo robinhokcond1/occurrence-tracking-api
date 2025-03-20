@@ -5,6 +5,8 @@ import com.carbigdata.br.occurrencetrackingapi.entity.FotoOcorrenciaEntity;
 import com.carbigdata.br.occurrencetrackingapi.repository.FotoOcorrenciaRepository;
 import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,11 +24,9 @@ public class FotoOcorrenciaService {
         return DtoConverter.toFotoOcorrenciaDTO(novaFoto);
     }
 
-    public List<FotoOcorrenciaDTO> listarFotosPorOcorrencia(Long ocorrenciaId) {
-        return fotoOcorrenciaRepository.findByOcorrenciaId(ocorrenciaId)
-                .stream()
-                .map(DtoConverter::toFotoOcorrenciaDTO)
-                .collect(Collectors.toList());
+    public Page<FotoOcorrenciaDTO> listarFotosPorOcorrencia(Long ocorrenciaId, Pageable pageable) {
+        return fotoOcorrenciaRepository.findByOcorrenciaId(ocorrenciaId, pageable)
+                .map(DtoConverter::toFotoOcorrenciaDTO);
     }
 
     public Optional<FotoOcorrenciaDTO> buscarFotoPorId(Long id) {

@@ -5,11 +5,12 @@ import com.carbigdata.br.occurrencetrackingapi.entity.ClienteEntity;
 import com.carbigdata.br.occurrencetrackingapi.repository.ClienteRepository;
 import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ClienteService {
@@ -17,28 +18,33 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Transactional
     public ClienteDTO criarCliente(ClienteDTO clienteDTO) {
+        if (clienteRepository.findByCpf(clienteDTO.getCpf()).isPresent()) {
+            throw new RuntimeException("CPF já cadastrado!");
+        }
+
         ClienteEntity cliente = new ClienteEntity();
         cliente.setNome(clienteDTO.getNome());
         cliente.setCpf(clienteDTO.getCpf());
         cliente.setDataNascimento(clienteDTO.getDataNascimento());
-        ClienteEntity novoCliente = clienteRepository.save(cliente);
-        return DtoConverter.toClienteDTO(novoCliente);
+
+        return DtoConverter.toClienteDTO(clienteRepository.save(cliente));
     }
 
-    public List<ClienteDTO> listarTodos() {
-        return clienteRepository.findAll()
-                .stream()
-                .map(DtoConverter::toClienteDTO)
-                .collect(Collectors.toList());
+    public Page<ClienteDTO> listarTodos(Pageable pageable) {
+        return clienteRepository.findAll(pageable).map(DtoConverter::toClienteDTO);
     }
 
     public Optional<ClienteDTO> buscarPorId(Long id) {
-        return clienteRepository.findById(id)
-                .map(DtoConverter::toClienteDTO);
+        return clienteRepository.findById(id).map(DtoConverter::toClienteDTO);
     }
 
+    @Transactional
     public void deletarCliente(Long id) {
+        if (!clienteRepository.existsById(id)) {
+            throw new RuntimeException("Cliente não encontrado!");
+        }
         clienteRepository.deleteById(id);
     }
 }

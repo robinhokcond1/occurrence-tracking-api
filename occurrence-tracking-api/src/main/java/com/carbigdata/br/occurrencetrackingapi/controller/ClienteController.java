@@ -3,6 +3,8 @@ package com.carbigdata.br.occurrencetrackingapi.controller;
 import com.carbigdata.br.occurrencetrackingapi.dto.ClienteDTO;
 import com.carbigdata.br.occurrencetrackingapi.service.ClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +26,9 @@ public class ClienteController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ClienteDTO>> listarClientes() {
-        return ResponseEntity.ok(clienteService.listarTodos());
+    public ResponseEntity<Page<ClienteDTO>> listarClientes(Pageable pageable) {
+        Page<ClienteDTO> clientes = clienteService.listarTodos(pageable);
+        return ResponseEntity.ok(clientes);
     }
 
     @GetMapping("/{id}")

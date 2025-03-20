@@ -2,8 +2,11 @@ package com.carbigdata.br.occurrencetrackingapi.controller;
 
 import com.carbigdata.br.occurrencetrackingapi.dto.OcorrenciaCreateDTO;
 import com.carbigdata.br.occurrencetrackingapi.dto.OcorrenciaDTO;
+import com.carbigdata.br.occurrencetrackingapi.enums.StatusOcorrenciaEnum;
 import com.carbigdata.br.occurrencetrackingapi.service.OcorrenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,8 +27,11 @@ public class OcorrenciaController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OcorrenciaDTO>> listarOcorrencias() {
-        return ResponseEntity.ok(ocorrenciaService.listarOcorrencias());
+    public ResponseEntity<Page<OcorrenciaDTO>> listarOcorrencias(
+            @RequestParam(defaultValue = "ATIVO") StatusOcorrenciaEnum status,
+            Pageable pageable) {
+        Page<OcorrenciaDTO> ocorrencias = ocorrenciaService.listarOcorrencias(status, pageable);
+        return ResponseEntity.ok(ocorrencias);
     }
 
     @GetMapping("/{id}")
