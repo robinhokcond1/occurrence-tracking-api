@@ -1,4 +1,4 @@
-package com.carbigdata.br.occurrencetrackingapi.config;
+package com.carbigdata.br.occurrencetrackingapi.config.minio;
 
 import io.minio.MinioClient;
 import org.springframework.beans.factory.annotation.Value;
