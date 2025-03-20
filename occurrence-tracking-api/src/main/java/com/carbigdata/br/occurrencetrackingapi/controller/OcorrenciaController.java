@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,10 +28,22 @@ public class OcorrenciaController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<OcorrenciaDTO>> listarOcorrencias(
+    public ResponseEntity<Page<OcorrenciaDTO>> listarOcorrenciasPorStatus(
             @RequestParam(defaultValue = "ATIVO") StatusOcorrenciaEnum status,
             Pageable pageable) {
-        Page<OcorrenciaDTO> ocorrencias = ocorrenciaService.listarOcorrencias(status, pageable);
+        Page<OcorrenciaDTO> ocorrencias = ocorrenciaService.listarOcorrenciasPorStatus(status, pageable);
+        return ResponseEntity.ok(ocorrencias);
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<OcorrenciaDTO>> listarOcorrencias(
+            @RequestParam(required = false) String cpf,
+            @RequestParam(required = false) String nomeCliente,
+            @RequestParam(required = false) LocalDate dataOcorrencia,
+            @RequestParam(required = false) String cidade,
+            Pageable pageable) {
+
+        Page<OcorrenciaDTO> ocorrencias = ocorrenciaService.listarOcorrencias(cpf, nomeCliente, dataOcorrencia, cidade, pageable);
         return ResponseEntity.ok(ocorrencias);
     }
 
@@ -43,5 +56,11 @@ public class OcorrenciaController {
     @PutMapping("/{id}/finalizar")
     public ResponseEntity<OcorrenciaDTO> finalizarOcorrencia(@PathVariable Long id) {
         return ResponseEntity.ok(ocorrenciaService.finalizarOcorrencia(id));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<OcorrenciaDTO> atualizarOcorrencia(@PathVariable Long id, @RequestBody OcorrenciaCreateDTO dto) {
+        OcorrenciaDTO ocorrenciaAtualizada = ocorrenciaService.atualizarOcorrencia(id, dto);
+        return ResponseEntity.ok(ocorrenciaAtualizada);
     }
 }
