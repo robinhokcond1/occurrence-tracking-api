@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
@@ -36,5 +37,13 @@ public class FotoOcorrenciaController {
     public ResponseEntity<Void> deletarFoto(@PathVariable Long id) {
         fotoOcorrenciaService.deletarFoto(id);
         return ResponseEntity.noContent().build();
+    }
+    @PostMapping("/upload/{ocorrenciaId}")
+    public ResponseEntity<FotoOcorrenciaDTO> uploadFoto(
+            @PathVariable Long ocorrenciaId,
+            @RequestParam("file") MultipartFile file) {
+
+        FotoOcorrenciaDTO fotoDTO = fotoOcorrenciaService.salvarFoto(ocorrenciaId, file);
+        return ResponseEntity.ok(fotoDTO);
     }
 }
