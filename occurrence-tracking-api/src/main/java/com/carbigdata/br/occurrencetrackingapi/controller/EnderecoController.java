@@ -3,6 +3,7 @@ package com.carbigdata.br.occurrencetrackingapi.controller;
 import com.carbigdata.br.occurrencetrackingapi.dto.EnderecoDTO;
 import com.carbigdata.br.occurrencetrackingapi.service.EnderecoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -21,27 +22,29 @@ public class EnderecoController {
     @Autowired
     private EnderecoService enderecoService;
 
-    @Operation(summary = "Cadastra um novo endereço", description = "Cria um novo endereço para um cliente.")
+    @Operation(summary = "Cadastra um novo endereço")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping
     public ResponseEntity<EnderecoDTO> salvarEndereco(@RequestBody EnderecoDTO enderecoDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(enderecoService.salvarEndereco(enderecoDTO));
     }
 
-    @Operation(summary = "Lista todos os endereços com paginação", description = "Retorna uma lista paginada de endereços cadastrados.")
+    @Operation(summary = "Lista todos os endereços com paginação")
     @GetMapping
     public ResponseEntity<Page<EnderecoDTO>> listarEnderecos(Pageable pageable) {
         Page<EnderecoDTO> enderecos = enderecoService.listarEnderecos(pageable);
         return ResponseEntity.ok(enderecos);
     }
 
-    @Operation(summary = "Busca um endereço pelo ID", description = "Retorna os detalhes de um endereço específico.")
+    @Operation(summary = "Busca um endereço pelo ID")
     @GetMapping("/{id}")
     public ResponseEntity<EnderecoDTO> buscarEndereco(@PathVariable Long id) {
         Optional<EnderecoDTO> endereco = enderecoService.buscarEnderecoPorId(id);
         return endereco.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    @Operation(summary = "Exclui um endereço pelo ID", description = "Remove um endereço do sistema pelo ID informado.")
+    @Operation(summary = "Exclui um endereço pelo ID")
+    @SecurityRequirement(name = "Bearer Authentication")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarEndereco(@PathVariable Long id) {
         enderecoService.deletarEndereco(id);
