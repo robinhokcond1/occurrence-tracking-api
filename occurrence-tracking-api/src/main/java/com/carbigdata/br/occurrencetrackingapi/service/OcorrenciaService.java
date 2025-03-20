@@ -45,13 +45,36 @@ public class OcorrenciaService {
         return DtoConverter.toOcorrenciaDTO(ocorrenciaRepository.save(ocorrencia));
     }
 
-    public Page<OcorrenciaDTO> listarOcorrencias(StatusOcorrenciaEnum status, Pageable pageable) {
+    public Page<OcorrenciaDTO> listarOcorrenciasPorStatus(StatusOcorrenciaEnum status, Pageable pageable) {
         return ocorrenciaRepository.findByStatusOcorrencia(status, pageable)
+                .map(DtoConverter::toOcorrenciaDTO);
+    }
+
+    public Page<OcorrenciaDTO> listarOcorrencias(
+            String cpf,
+            String nomeCliente,
+            LocalDate dataOcorrencia,
+            String cidade,
+            Pageable pageable) {
+
+        return ocorrenciaRepository.findByFilters(cpf, nomeCliente, dataOcorrencia, cidade, pageable)
                 .map(DtoConverter::toOcorrenciaDTO);
     }
 
     public Optional<OcorrenciaDTO> buscarPorId(Long id) {
         return ocorrenciaRepository.findById(id).map(DtoConverter::toOcorrenciaDTO);
+    }
+
+    public OcorrenciaDTO atualizarOcorrencia(Long id, OcorrenciaCreateDTO dto) {
+        OcorrenciaEntity ocorrencia = ocorrenciaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Ocorrência não encontrada"));
+
+        if (ocorrencia.getStatusOcorrencia() == StatusOcorrenciaEnum.FINALIZADA) {
+            throw new RuntimeException("Ocorrência finalizada não pode ser alterada.");
+        }
+
+        ocorrencia.setDataOcorrencia(dto.getDataOcorrencia());
+        return DtoConverter.toOcorrenciaDTO(ocorrenciaRepository.save(ocorrencia));
     }
 
     public OcorrenciaDTO finalizarOcorrencia(Long id) {
