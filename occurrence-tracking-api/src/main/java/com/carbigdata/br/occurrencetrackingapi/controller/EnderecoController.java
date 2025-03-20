@@ -3,6 +3,8 @@ package com.carbigdata.br.occurrencetrackingapi.controller;
 import com.carbigdata.br.occurrencetrackingapi.dto.EnderecoDTO;
 import com.carbigdata.br.occurrencetrackingapi.service.EnderecoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +25,9 @@ public class EnderecoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<EnderecoDTO>> listarEnderecos() {
-        return ResponseEntity.ok(enderecoService.listarEnderecos());
+    public ResponseEntity<Page<EnderecoDTO>> listarEnderecos(Pageable pageable) {
+        Page<EnderecoDTO> enderecos = enderecoService.listarEnderecos(pageable);
+        return ResponseEntity.ok(enderecos);
     }
 
     @GetMapping("/{id}")

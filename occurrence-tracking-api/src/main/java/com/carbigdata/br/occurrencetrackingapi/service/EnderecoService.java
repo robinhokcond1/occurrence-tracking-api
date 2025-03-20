@@ -5,11 +5,11 @@ import com.carbigdata.br.occurrencetrackingapi.entity.EnderecoEntity;
 import com.carbigdata.br.occurrencetrackingapi.repository.EnderecoRepository;
 import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class EnderecoService {
@@ -25,20 +25,15 @@ public class EnderecoService {
         endereco.setCidade(enderecoDTO.getCidade());
         endereco.setEstado(enderecoDTO.getEstado());
 
-        EnderecoEntity novoEndereco = enderecoRepository.save(endereco);
-        return DtoConverter.toEnderecoDTO(novoEndereco);
+        return DtoConverter.toEnderecoDTO(enderecoRepository.save(endereco));
     }
 
-    public List<EnderecoDTO> listarEnderecos() {
-        return enderecoRepository.findAll()
-                .stream()
-                .map(DtoConverter::toEnderecoDTO)
-                .collect(Collectors.toList());
+    public Page<EnderecoDTO> listarEnderecos(Pageable pageable) {
+        return enderecoRepository.findAll(pageable).map(DtoConverter::toEnderecoDTO);
     }
 
     public Optional<EnderecoDTO> buscarEnderecoPorId(Long id) {
-        return enderecoRepository.findById(id)
-                .map(DtoConverter::toEnderecoDTO);
+        return enderecoRepository.findById(id).map(DtoConverter::toEnderecoDTO);
     }
 
     public void deletarEndereco(Long id) {
