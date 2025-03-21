@@ -7,6 +7,11 @@ import org.springframework.data.domain.Pageable;
 import java.time.LocalDate;
 
 public interface OcorrenciaRepositoryCustom {
-    Page<OcorrenciaEntity> findByFilters(String cpf, String nomeCliente, LocalDate dataOcorrencia, String cidade, Pageable pageable);
+    Page<OcorrenciaEntity> findByFilters(
+            String cpf,
+            String nomeCliente,
+            LocalDate dataOcorrencia,
+            String cidade,
+            Pageable pageable);
 }
 

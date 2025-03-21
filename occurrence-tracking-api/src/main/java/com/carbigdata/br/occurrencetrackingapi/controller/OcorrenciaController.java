@@ -2,9 +2,7 @@ package com.carbigdata.br.occurrencetrackingapi.controller;
 
 import com.carbigdata.br.occurrencetrackingapi.dto.OcorrenciaCreateDTO;
 import com.carbigdata.br.occurrencetrackingapi.dto.OcorrenciaDTO;
-import com.carbigdata.br.occurrencetrackingapi.dto.OcorrenciaResponseDTO;
-import com.carbigdata.br.occurrencetrackingapi.repository.OcorrenciaRepository;
-import com.carbigdata.br.occurrencetrackingapi.service.MinioService;
+import com.carbigdata.br.occurrencetrackingapi.enums.StatusOcorrenciaEnum;
 import com.carbigdata.br.occurrencetrackingapi.service.OcorrenciaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -17,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/ocorrencias")
@@ -25,12 +24,6 @@ public class OcorrenciaController {
 
     @Autowired
     private OcorrenciaService ocorrenciaService;
-
-    @Autowired
-    private OcorrenciaRepository ocorrenciaRepository;
-
-    @Autowired  // 🔹 Adicionando injeção do MinioService
-    private MinioService minioService;
 
     @Operation(summary = "Registra uma nova ocorrência")
     @SecurityRequirement(name = "Bearer Authentication")
@@ -45,19 +38,4 @@ public class OcorrenciaController {
     public ResponseEntity<OcorrenciaDTO> finalizarOcorrencia(@PathVariable Long id) {
         return ResponseEntity.ok(ocorrenciaService.finalizarOcorrencia(id));
     }
-
-    @Operation(summary = "Lista todas as ocorrências com detalhes do cliente, endereço e evidências")
-    @SecurityRequirement(name = "Bearer Authentication")
-    @GetMapping
-    public ResponseEntity<Page<OcorrenciaResponseDTO>> listarOcorrencias(
-            @RequestParam(required = false) String cpf,
-            @RequestParam(required = false) String nomeCliente,
-            @RequestParam(required = false) LocalDate dataOcorrencia,
-            @RequestParam(required = false) String cidade,
-            Pageable pageable) {
-
-        Page<OcorrenciaResponseDTO> response = ocorrenciaService.listarOcorrencias(cpf, nomeCliente, dataOcorrencia, cidade, pageable);
-        return ResponseEntity.ok(response);
-    }
-
 }
