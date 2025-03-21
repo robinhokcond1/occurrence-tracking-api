@@ -34,5 +34,4 @@ public class EnderecoEntity {
     @Column(name = "nme_estado")
     private String estado;
 
-
 }

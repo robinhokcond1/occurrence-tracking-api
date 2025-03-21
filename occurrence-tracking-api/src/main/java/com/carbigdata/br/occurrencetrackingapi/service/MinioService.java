@@ -1,7 +1,9 @@
 package com.carbigdata.br.occurrencetrackingapi.service;
 
+import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.http.Method;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,9 @@ public class MinioService {
     @Value("${minio.bucket-name}")
     private String bucketName;
 
+    @Value("${minio.url}")
+    private String minioUrl;
+
     public String uploadFile(MultipartFile file, Long ocorrenciaId) {
         try {
             String uniqueFileName = ocorrenciaId + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
@@ -33,10 +38,23 @@ public class MinioService {
                             .build()
             );
 
-            return uniqueFileName;
+            return uniqueFileName; // Retorna o caminho do arquivo salvo no bucket
         } catch (Exception e) {
             throw new RuntimeException("Erro ao enviar arquivo para MinIO", e);
         }
     }
-}
 
+    public String getFileUrl(String filePath) {
+        try {
+            return minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .bucket(bucketName)
+                            .object(filePath)
+                            .method(Method.GET)
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao gerar URL para arquivo no MinIO", e);
+        }
+    }
+}
