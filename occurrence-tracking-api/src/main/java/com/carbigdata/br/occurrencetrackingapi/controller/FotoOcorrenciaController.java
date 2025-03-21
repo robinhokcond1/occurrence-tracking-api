@@ -68,19 +68,12 @@ public class FotoOcorrenciaController {
     @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping(value = "/upload/{ocorrenciaId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadEvidencia(
-
-            @Parameter(description = "ID da ocorrência para associar a imagem", required = true)
             @PathVariable Long ocorrenciaId,
-            @Parameter(description = "Arquivo de imagem a ser enviado", required = true)
             @RequestParam("file") MultipartFile file) {
-        String filePath = minioService.uploadFile(file, ocorrenciaId); // 🔹 Agora minioService está disponível
 
-        OcorrenciaEntity ocorrencia = ocorrenciaRepository.findById(ocorrenciaId)
-                .orElseThrow(() -> new RuntimeException("Ocorrência não encontrada"));
-        ocorrencia.setEvidenciaPath(filePath);
-        ocorrenciaRepository.save(ocorrencia);
+        FotoOcorrenciaDTO fotoSalva = fotoOcorrenciaService.salvarFoto(ocorrenciaId, file);
 
-        return ResponseEntity.ok("Arquivo salvo com sucesso: " + filePath);
+        return ResponseEntity.ok("Arquivo salvo com sucesso! ID da foto: " + fotoSalva.getId());
     }
 
 }

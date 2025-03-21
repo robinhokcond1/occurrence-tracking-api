@@ -4,21 +4,29 @@ import com.carbigdata.br.occurrencetrackingapi.entity.ClienteEntity;
 import com.carbigdata.br.occurrencetrackingapi.entity.EnderecoEntity;
 import com.carbigdata.br.occurrencetrackingapi.entity.OcorrenciaEntity;
 import com.carbigdata.br.occurrencetrackingapi.enums.StatusOcorrenciaEnum;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Testcontainers  // 🔹 Garante que o Testcontainers está ativo
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-
 class OcorrenciaRepositoryTest {
 
     @Autowired
@@ -34,12 +42,30 @@ class OcorrenciaRepositoryTest {
     private EnderecoEntity endereco;
     private OcorrenciaEntity ocorrencia;
 
+    // 🔹 Configurando o PostgreSQL Container para os testes
+    @Container
+    private static final PostgreSQLContainer<?> postgreSQLContainer =
+            new PostgreSQLContainer<>("postgres:16.1")
+                    .withDatabaseName("occurrence-tracking-test")
+                    .withUsername("admin")
+                    .withPassword("admin");
+
+    // 🔹 Define as propriedades dinâmicas para o Spring usar o Testcontainers
+    @DynamicPropertySource
+    static void configureProperties(DynamicPropertyRegistry registry) {
+        registry.add("spring.datasource.url", postgreSQLContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", postgreSQLContainer::getUsername);
+        registry.add("spring.datasource.password", postgreSQLContainer::getPassword);
+        registry.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
+    }
+
+    @Transactional
     @BeforeEach
     void setup() {
         // Limpa os dados antigos do banco antes de inserir novos registros
         ocorrenciaRepository.deleteAll();
-        clienteRepository.deleteAll();
         enderecoRepository.deleteAll();
+        clienteRepository.deleteAll();
 
         // Criando Cliente
         cliente = new ClienteEntity();
@@ -91,5 +117,4 @@ class OcorrenciaRepositoryTest {
         assertThat(ocorrencias).isNotEmpty();
         assertThat(ocorrencias.get(0).getEndereco().getCidade()).isEqualTo("São Paulo");
     }
-
 }

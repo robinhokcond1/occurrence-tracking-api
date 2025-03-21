@@ -6,6 +6,9 @@ import com.carbigdata.br.occurrencetrackingapi.entity.OcorrenciaEntity;
 import com.carbigdata.br.occurrencetrackingapi.repository.FotoOcorrenciaRepository;
 import com.carbigdata.br.occurrencetrackingapi.repository.OcorrenciaRepository;
 import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
+
+import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +32,7 @@ public class FotoOcorrenciaService {
     @Autowired
     private MinioService minioService;
 
+    @Transactional
     public FotoOcorrenciaDTO salvarFoto(Long ocorrenciaId, MultipartFile file) {
         OcorrenciaEntity ocorrencia = ocorrenciaRepository.findById(ocorrenciaId)
                 .orElseThrow(() -> new RuntimeException("Ocorrência não encontrada"));
