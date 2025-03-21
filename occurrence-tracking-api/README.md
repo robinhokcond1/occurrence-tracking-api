@@ -10,6 +10,7 @@ Bem-vindo à **Occurrence Tracking API**! Esta API foi desenvolvida para realiza
 - Spring Data JPA
 - Spring Security + JWT
 - PostgreSQL
+- **Flyway**
 - MinIO (Storage de Evidências)
 - Swagger/OpenAPI
 - JUnit + Mockito (Testes Unitários)
@@ -33,7 +34,7 @@ Bem-vindo à **Occurrence Tracking API**! Esta API foi desenvolvida para realiza
 - Cadastro, busca e exclusão de endereços
 - Autenticação e registro de usuários com JWT
 - Endpoint `/me` para verificar usuário autenticado
-- Documentação Swagger em `/swagger-ui.html`
+- Documentação Swagger em `/swagger-ui/index.html#`
 
 ## 🔐 Segurança
 
@@ -48,7 +49,7 @@ Authorization: Bearer <seu_token>
 ### 1. Clone o projeto
 
 ```bash
-git clone https://robinhokcond-admin@bitbucket.org/robinhokcond/occurrence-tracking-api.git
+git clone https://seu-usuario@bitbucket.org/seu-usuario/occurrence-tracking-api.git
 cd occurrence-tracking-api
 ```
 
