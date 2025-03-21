@@ -27,6 +27,7 @@ public class ClienteEntity {
     private String cpf;
 
     @Column(name = "dta_criacao",nullable = false)
-    private LocalDateTime dataCriacao;
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime dataCriacao = LocalDateTime.now();
 
 }

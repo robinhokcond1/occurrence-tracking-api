@@ -6,6 +6,7 @@ import com.carbigdata.br.occurrencetrackingapi.entity.OcorrenciaEntity;
 import com.carbigdata.br.occurrencetrackingapi.repository.FotoOcorrenciaRepository;
 import com.carbigdata.br.occurrencetrackingapi.repository.OcorrenciaRepository;
 import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,20 +30,29 @@ public class FotoOcorrenciaService {
     @Autowired
     private MinioService minioService;
 
+    @Transactional
     public FotoOcorrenciaDTO salvarFoto(Long ocorrenciaId, MultipartFile file) {
-        OcorrenciaEntity ocorrencia = ocorrenciaRepository.findById(ocorrenciaId)
-                .orElseThrow(() -> new RuntimeException("Ocorrência não encontrada"));
+        System.out.println("🔹 MÉTODO salvarFoto INICIADO!"); // <--- Adicionado
+        try {
+            OcorrenciaEntity ocorrencia = ocorrenciaRepository.findById(ocorrenciaId)
+                    .orElseThrow(() -> new RuntimeException("Ocorrência não encontrada"));
 
-        // 🔹 Upload da imagem para MinIO
-        String pathBucket = minioService.uploadFile(file, ocorrenciaId);
+            String pathBucket = minioService.uploadFile(file, ocorrenciaId);
+            System.out.println("Imagem enviada para MinIO: " + pathBucket);
 
-        // 🔹 Salvar a foto no banco de dados
-        FotoOcorrenciaEntity foto = new FotoOcorrenciaEntity();
-        foto.setOcorrencia(ocorrencia);
-        foto.setDscPathBucket(pathBucket);
-        foto.setDscHash(UUID.randomUUID().toString());
+            FotoOcorrenciaEntity foto = new FotoOcorrenciaEntity();
+            foto.setOcorrencia(ocorrencia);
+            foto.setDscPathBucket(pathBucket);
+            foto.setDscHash(UUID.randomUUID().toString());
 
-        return DtoConverter.toFotoOcorrenciaDTO(fotoOcorrenciaRepository.save(foto));
+            FotoOcorrenciaEntity savedFoto = fotoOcorrenciaRepository.save(foto);
+            System.out.println("Foto persistida no banco: ID -> " + savedFoto.getId());
+
+            return DtoConverter.toFotoOcorrenciaDTO(savedFoto);
+        } catch (Exception e) {
+            System.err.println("Erro ao salvar a foto: " + e.getMessage());
+            throw e;
+        }
     }
 
     public Page<FotoOcorrenciaDTO> listarFotosPorOcorrencia(Long ocorrenciaId, Pageable pageable) {
