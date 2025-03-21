@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -25,12 +26,14 @@ public class FotoOcorrenciaEntity {
     @JoinColumn(name = "cod_ocorrencia", nullable = false)
     private OcorrenciaEntity ocorrencia;
 
-    @Column(name = "dta_criacao",nullable = false)
-    private LocalDateTime dataCriacao;
-
     @Column(name = "dsc_path_bucket", nullable = false)
     private String dscPathBucket;
 
-    @Column(name = "dsc_hash", nullable = false)
+    @Column(name = "dsc_hash", nullable = false, unique = true)
     private String dscHash;
+
+    @Column(name = "dta_criacao", nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime dataCriacao = LocalDateTime.now();
 }
+
