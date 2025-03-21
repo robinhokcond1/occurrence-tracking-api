@@ -2,6 +2,7 @@ package com.carbigdata.br.occurrencetrackingapi.service;
 
 import com.carbigdata.br.occurrencetrackingapi.dto.OcorrenciaCreateDTO;
 import com.carbigdata.br.occurrencetrackingapi.dto.OcorrenciaDTO;
+import com.carbigdata.br.occurrencetrackingapi.dto.OcorrenciaResponseDTO;
 import com.carbigdata.br.occurrencetrackingapi.entity.ClienteEntity;
 import com.carbigdata.br.occurrencetrackingapi.entity.EnderecoEntity;
 import com.carbigdata.br.occurrencetrackingapi.entity.OcorrenciaEntity;
@@ -30,6 +31,9 @@ public class OcorrenciaService {
     @Autowired
     private EnderecoRepository enderecoRepository;
 
+    @Autowired
+    private MinioService minioService;
+
     public OcorrenciaDTO registrarOcorrencia(OcorrenciaCreateDTO dto) {
         ClienteEntity cliente = clienteRepository.findById(dto.getClienteId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
@@ -50,15 +54,32 @@ public class OcorrenciaService {
                 .map(DtoConverter::toOcorrenciaDTO);
     }
 
-    public Page<OcorrenciaDTO> listarOcorrencias(
+    public Page<OcorrenciaResponseDTO> listarOcorrencias(
             String cpf,
             String nomeCliente,
             LocalDate dataOcorrencia,
             String cidade,
             Pageable pageable) {
 
-        return ocorrenciaRepository.findByFilters(cpf, nomeCliente, dataOcorrencia, cidade, pageable)
-                .map(DtoConverter::toOcorrenciaDTO);
+        Page<OcorrenciaEntity> ocorrencias = ocorrenciaRepository.findByFilters(cpf, nomeCliente, dataOcorrencia, cidade, pageable);
+
+        return ocorrencias.map(ocorrencia -> {
+            OcorrenciaResponseDTO dto = new OcorrenciaResponseDTO();
+            dto.setId(ocorrencia.getId());
+            dto.setClienteNome(ocorrencia.getCliente().getNome());
+            dto.setCpf(ocorrencia.getCliente().getCpf());
+            dto.setEndereco(ocorrencia.getEndereco().getLogradouro() + ", " + ocorrencia.getEndereco().getCidade());
+            dto.setCidade(ocorrencia.getEndereco().getCidade());
+            dto.setDataOcorrencia(ocorrencia.getDataOcorrencia());
+
+            dto.setEvidenciasUrl(
+                    (ocorrencia.getEvidenciaPath() != null && !ocorrencia.getEvidenciaPath().isEmpty())
+                            ? minioService.getFileUrl(ocorrencia.getEvidenciaPath())
+                            : null
+            );
+
+            return dto;
+        });
     }
 
     public Optional<OcorrenciaDTO> buscarPorId(Long id) {

@@ -1,10 +1,13 @@
 package com.carbigdata.br.occurrencetrackingapi.controller;
 
 import com.carbigdata.br.occurrencetrackingapi.dto.FotoOcorrenciaDTO;
+import com.carbigdata.br.occurrencetrackingapi.entity.OcorrenciaEntity;
+import com.carbigdata.br.occurrencetrackingapi.repository.OcorrenciaRepository;
 import com.carbigdata.br.occurrencetrackingapi.service.FotoOcorrenciaService;
+import com.carbigdata.br.occurrencetrackingapi.service.MinioService;
+import com.carbigdata.br.occurrencetrackingapi.service.OcorrenciaService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,8 +25,19 @@ import java.util.Optional;
 @Tag(name = "Fotos de Ocorrências", description = "Gerenciamento de imagens associadas a ocorrências")
 public class FotoOcorrenciaController {
 
+
     @Autowired
     private FotoOcorrenciaService fotoOcorrenciaService;
+
+    @Autowired
+    private OcorrenciaService ocorrenciaService;
+
+    @Autowired
+    private OcorrenciaRepository ocorrenciaRepository;
+
+    @Autowired
+    private MinioService minioService;
+
 
     @Operation(summary = "Lista todas as fotos de uma ocorrência")
     @GetMapping("/ocorrencia/{ocorrenciaId}")
@@ -51,18 +65,22 @@ public class FotoOcorrenciaController {
 
     @Operation(summary = "Faz upload de uma imagem para uma ocorrência",
             description = "Envia um arquivo de imagem e associa à ocorrência especificada pelo ID.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Imagem enviada com sucesso"),
-            @ApiResponse(responseCode = "400", description = "Erro na requisição"),
-            @ApiResponse(responseCode = "500", description = "Erro interno do servidor")
-    })
+    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping(value = "/upload/{ocorrenciaId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<FotoOcorrenciaDTO> uploadFoto(
-            @PathVariable Long ocorrenciaId,
-            @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> uploadEvidencia(
 
-        FotoOcorrenciaDTO fotoDTO = fotoOcorrenciaService.salvarFoto(ocorrenciaId, file);
-        return ResponseEntity.ok(fotoDTO);
+            @Parameter(description = "ID da ocorrência para associar a imagem", required = true)
+            @PathVariable Long ocorrenciaId,
+            @Parameter(description = "Arquivo de imagem a ser enviado", required = true)
+            @RequestParam("file") MultipartFile file) {
+        String filePath = minioService.uploadFile(file, ocorrenciaId); // 🔹 Agora minioService está disponível
+
+        OcorrenciaEntity ocorrencia = ocorrenciaRepository.findById(ocorrenciaId)
+                .orElseThrow(() -> new RuntimeException("Ocorrência não encontrada"));
+        ocorrencia.setEvidenciaPath(filePath);
+        ocorrenciaRepository.save(ocorrencia);
+
+        return ResponseEntity.ok("Arquivo salvo com sucesso: " + filePath);
     }
 
 }

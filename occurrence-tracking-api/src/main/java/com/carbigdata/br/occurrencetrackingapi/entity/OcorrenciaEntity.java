@@ -37,4 +37,7 @@ public class OcorrenciaEntity {
     @Column(name = "sta_ocorrencia", nullable = false)
     private StatusOcorrenciaEnum statusOcorrencia;
 
+    @Column(name = "evidencia_path")
+    private String evidenciaPath;
+
 }

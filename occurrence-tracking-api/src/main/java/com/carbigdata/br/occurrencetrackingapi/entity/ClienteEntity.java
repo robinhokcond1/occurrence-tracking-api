@@ -17,7 +17,7 @@ public class ClienteEntity {
     @Column(name = "cod_cliente")
     private Long id;
 
-    @Column(name = "nme_cliente", length = 50, nullable = false)
+    @Column(name = "nme_cliente", length = 255,  nullable = false, columnDefinition = "VARCHAR(255)")
     private String nome;
 
     @Column(name = "dta_nascimento")
