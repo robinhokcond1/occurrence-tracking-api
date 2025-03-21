@@ -48,7 +48,7 @@ Authorization: Bearer <seu_token>
 ### 1. Clone o projeto
 
 ```bash
-git clone https://github.com/seuusuario/occurrence-tracking-api.git
+git clone https://robinhokcond-admin@bitbucket.org/robinhokcond/occurrence-tracking-api.git
 cd occurrence-tracking-api
 ```
 
@@ -65,7 +65,7 @@ Isso irá subir:
 
 ### 3. Acesse a aplicação
 
-- Swagger UI: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
+- Swagger UI: [http://localhost:8080/swagger-ui/index.html#](http://localhost:8080/swagger-ui/index.html#)
 - MinIO Console: [http://localhost:9000](http://localhost:9000)
   - Usuário: `admin`
   - Senha: `admin123`
