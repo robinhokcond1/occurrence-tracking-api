@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,9 +24,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -52,8 +49,6 @@ class OcorrenciaServiceTest {
 
     @BeforeEach
     void setup() {
-        MockitoAnnotations.openMocks(this);
-
         cliente = new ClienteEntity();
         cliente.setId(1L);
         cliente.setNome("João Silva");
@@ -85,35 +80,43 @@ class OcorrenciaServiceTest {
 
         OcorrenciaDTO resultado = ocorrenciaService.registrarOcorrencia(dto);
 
-        assertNotNull(resultado);
-        assertEquals(1L, resultado.getId());
-        assertEquals("João Silva", resultado.getCliente().getNome());
-        assertEquals("São Paulo", resultado.getEndereco().getCidade());
+        assertThat(resultado).isNotNull();
+        assertThat(resultado.getId()).isEqualTo(1L);
+        assertThat(resultado.getCliente().getNome()).isEqualTo("João Silva");
+        assertThat(resultado.getEndereco().getCidade()).isEqualTo("São Paulo");
 
-        verify(ocorrenciaRepository, times(1)).save(any(OcorrenciaEntity.class));
+        verify(ocorrenciaRepository).save(any(OcorrenciaEntity.class));
     }
 
     @Test
     void deveFinalizarOcorrencia() {
         when(ocorrenciaRepository.findById(1L)).thenReturn(Optional.of(ocorrencia));
-        when(ocorrenciaRepository.save(any(OcorrenciaEntity.class))).thenReturn(ocorrencia);
+        when(ocorrenciaRepository.save(any(OcorrenciaEntity.class))).thenAnswer(invocation -> {
+            OcorrenciaEntity entity = invocation.getArgument(0);
+            entity.setStatusOcorrencia(StatusOcorrenciaEnum.FINALIZADA);
+            return entity;
+        });
 
         OcorrenciaDTO resultado = ocorrenciaService.finalizarOcorrencia(1L);
 
+        assertThat(resultado).isNotNull();
         assertThat(resultado.getStatusOcorrencia()).isEqualTo(StatusOcorrenciaEnum.FINALIZADA);
-        verify(ocorrenciaRepository, times(1)).save(any(OcorrenciaEntity.class));
+
+        verify(ocorrenciaRepository).save(any(OcorrenciaEntity.class));
     }
 
     @Test
     void deveListarOcorrenciasComFiltros() {
-        Page<OcorrenciaEntity> ocorrenciaPage = new PageImpl<>(List.of(ocorrencia));
-        when(ocorrenciaRepository.findByFilters(any(), any(), any(), any(), any())).thenReturn(ocorrenciaPage);
+        Page<OcorrenciaEntity> ocorrencias = new PageImpl<>(List.of(ocorrencia));
+        when(ocorrenciaRepository.findByFilters(any(), any(), any(), any(), any())).thenReturn(ocorrencias);
 
         Page<OcorrenciaResponseDTO> resultado = ocorrenciaService.listarOcorrencias("12345678900", "João", null, "São Paulo", Pageable.unpaged());
 
         assertThat(resultado).isNotNull();
+        assertThat(resultado.getContent()).hasSize(1);
         assertThat(resultado.getContent().get(0).getClienteNome()).isEqualTo("João Silva");
-        verify(ocorrenciaRepository, times(1)).findByFilters(any(), any(), any(), any(), any());
+
+        verify(ocorrenciaRepository).findByFilters(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -124,9 +127,8 @@ class OcorrenciaServiceTest {
         OcorrenciaDTO resultado = ocorrenciaService.atualizarOcorrencia(1L, dto);
 
         assertThat(resultado).isNotNull();
-        verify(ocorrenciaRepository, times(1)).save(any(OcorrenciaEntity.class));
+        assertThat(resultado.getDataOcorrencia()).isEqualTo(dto.getDataOcorrencia());
+
+        verify(ocorrenciaRepository).save(any(OcorrenciaEntity.class));
     }
-
-
-
 }

@@ -3,56 +3,51 @@ package com.carbigdata.br.occurrencetrackingapi.service;
 import com.carbigdata.br.occurrencetrackingapi.dto.FotoOcorrenciaDTO;
 import com.carbigdata.br.occurrencetrackingapi.entity.FotoOcorrenciaEntity;
 import com.carbigdata.br.occurrencetrackingapi.entity.OcorrenciaEntity;
+import com.carbigdata.br.occurrencetrackingapi.exception.RecursoNaoEncontradoException;
 import com.carbigdata.br.occurrencetrackingapi.repository.FotoOcorrenciaRepository;
 import com.carbigdata.br.occurrencetrackingapi.repository.OcorrenciaRepository;
 import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class FotoOcorrenciaService {
 
-    @Autowired
-    private FotoOcorrenciaRepository fotoOcorrenciaRepository;
+    private final FotoOcorrenciaRepository fotoOcorrenciaRepository;
+    private final OcorrenciaRepository ocorrenciaRepository;
+    private final MinioService minioService;
 
-    @Autowired
-    private OcorrenciaRepository ocorrenciaRepository;
+    public FotoOcorrenciaDTO salvarFoto(Long ocorrenciaId, MultipartFile file) {
+        String pathBucket;
+        try {
+            pathBucket = minioService.uploadFile(file, ocorrenciaId);
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao enviar arquivo para MinIO", e);
+        }
 
-    @Autowired
-    private MinioService minioService;
+        return salvarFotoNaBase(ocorrenciaId, pathBucket);
+    }
 
     @Transactional
-    public FotoOcorrenciaDTO salvarFoto(Long ocorrenciaId, MultipartFile file) {
-        System.out.println("🔹 MÉTODO salvarFoto INICIADO!"); // <--- Adicionado
-        try {
-            OcorrenciaEntity ocorrencia = ocorrenciaRepository.findById(ocorrenciaId)
-                    .orElseThrow(() -> new RuntimeException("Ocorrência não encontrada"));
+    protected FotoOcorrenciaDTO salvarFotoNaBase(Long ocorrenciaId, String pathBucket) {
+        OcorrenciaEntity ocorrencia = ocorrenciaRepository.findById(ocorrenciaId)
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Ocorrência não encontrada com ID: " + ocorrenciaId));
 
-            String pathBucket = minioService.uploadFile(file, ocorrenciaId);
-            System.out.println("Imagem enviada para MinIO: " + pathBucket);
+        FotoOcorrenciaEntity foto = new FotoOcorrenciaEntity();
+        foto.setOcorrencia(ocorrencia);
+        foto.setDscPathBucket(pathBucket);
+        foto.setDscHash(UUID.randomUUID().toString());
 
-            FotoOcorrenciaEntity foto = new FotoOcorrenciaEntity();
-            foto.setOcorrencia(ocorrencia);
-            foto.setDscPathBucket(pathBucket);
-            foto.setDscHash(UUID.randomUUID().toString());
-
-            FotoOcorrenciaEntity savedFoto = fotoOcorrenciaRepository.save(foto);
-            System.out.println("Foto persistida no banco: ID -> " + savedFoto.getId());
-
-            return DtoConverter.toFotoOcorrenciaDTO(savedFoto);
-        } catch (Exception e) {
-            System.err.println("Erro ao salvar a foto: " + e.getMessage());
-            throw e;
-        }
+        FotoOcorrenciaEntity savedFoto = fotoOcorrenciaRepository.save(foto);
+        return DtoConverter.toFotoOcorrenciaDTO(savedFoto);
     }
 
     public Page<FotoOcorrenciaDTO> listarFotosPorOcorrencia(Long ocorrenciaId, Pageable pageable) {
@@ -66,6 +61,9 @@ public class FotoOcorrenciaService {
     }
 
     public void deletarFoto(Long id) {
+        if (!fotoOcorrenciaRepository.existsById(id)) {
+            throw new RecursoNaoEncontradoException("Foto não encontrada com ID: " + id);
+        }
         fotoOcorrenciaRepository.deleteById(id);
     }
 }

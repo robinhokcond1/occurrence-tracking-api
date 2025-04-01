@@ -1,6 +1,7 @@
 package com.carbigdata.br.occurrencetrackingapi.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
@@ -22,7 +23,6 @@ public class ClienteDTO {
     @Pattern(regexp = "\\d{11}", message = "O CPF deve conter exatamente 11 dígitos numéricos.")
     private String cpf;
 
-    @NotBlank(message = "A data de nascimento não pode estar vazia.")
+    @NotNull(message = "A data de nascimento não pode estar vazia.")
     private LocalDateTime dataNascimento;
 }
-
