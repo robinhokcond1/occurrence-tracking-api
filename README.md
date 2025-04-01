@@ -1,89 +1,91 @@
-
 # 📊 Occurrence Tracking API
 
-Bem-vindo à **Occurrence Tracking API**! Esta API foi desenvolvida para realizar o gerenciamento de ocorrências vinculadas a clientes e seus respectivos endereços, com suporte a upload de evidências em imagens utilizando o **MinIO** como storage. O projeto inclui autenticação com **JWT**, arquitetura em camadas, testes unitários e integração com o banco de dados **PostgreSQL**.
+Bem-vindo à **Occurrence Tracking API**! Esta API permite o gerenciamento de ocorrências associadas a clientes e endereços, com upload de imagens como evidências utilizando o MinIO.
 
-## 🚀 Tecnologias Utilizadas
+---
+
+## ✅ Tecnologias Utilizadas
 
 - Java 21
 - Spring Boot 3
 - Spring Data JPA
 - Spring Security + JWT
-- PostgreSQL
-- **Flyway**
-- MinIO (Storage de Evidências)
+- PostgreSQL + Flyway
+- MinIO (Armazenamento de imagens)
 - Swagger/OpenAPI
 - JUnit + Mockito (Testes Unitários)
-- Docker
+- Docker e Docker Compose
+
+---
 
 ## 🧱 Arquitetura do Projeto
 
 - **Controller**: Camada de entrada da API (HTTP)
 - **Service**: Regras de negócio
-- **Repository**: Acesso ao banco de dados com JPA + consultas customizadas
-- **DTOs**: Transferência de dados entre camadas
-- **Entities**: Representações das tabelas do banco
-- **MinIO**: Upload e acesso a imagens como evidências de ocorrências
+- **Repository**: Acesso ao banco com JPA
+- **DTOs**: Comunicação entre camadas
+- **Entities**: Representações do banco
+- **MinIO**: Upload e acesso a evidências (imagens)
+
+---
 
 ## ✅ Funcionalidades
 
-- Registro de ocorrências
+- Registro e finalização de ocorrências
 - Upload de evidências por ocorrência
-- Listagem e busca com filtros (nome, CPF, cidade, data)
+- Listagem e filtros por nome, CPF, cidade e data
 - Cadastro, busca e exclusão de clientes
 - Cadastro, busca e exclusão de endereços
-- Autenticação e registro de usuários com JWT
-- Endpoint `/me` para verificar usuário autenticado
-- Documentação Swagger em `/swagger-ui/index.html#`
+- Autenticação com JWT (registro e login)
+- Verificação do usuário logado com o endpoint `/me`
+- Documentação interativa com Swagger
+
+---
 
 ## 🔐 Segurança
 
-A autenticação é feita via **JWT Token**. Após realizar o login, inclua o token retornado no header das suas requisições:
+A autenticação é feita via **JWT**. Após realizar o login, inclua o token no header:
 
-```
+```http
 Authorization: Bearer <seu_token>
 ```
 
-## 🐳 Como rodar o projeto com Docker
+---
 
-### 1. Clone o projeto
+## 🐳 Como rodar com Docker
 
 ```bash
-git clone https://seu-usuario@bitbucket.org/seu-usuario/occurrence-tracking-api.git
+# 1. Clone o repositório
+git clone https://bitbucket.org/robinhokcond1/occurrence-tracking-api.git
 cd occurrence-tracking-api
-```
 
-### 2. Execute os containers com Docker Compose
-
-```bash
+# 2. Execute com Docker Compose
 docker-compose up -d
 ```
 
-Isso irá subir:
-- Banco de dados PostgreSQL
-- MinIO
-- API
+### 🤝 Acesso:
 
-### 3. Acesse a aplicação
+- **Swagger UI**: http://localhost:8080/swagger-ui/index.html#
+- **MinIO Console**: http://localhost:9000  
+  Usuário: `admin`  
+  Senha: `admin123`
 
-- Swagger UI: [http://localhost:8080/swagger-ui/index.html#](http://localhost:8080/swagger-ui/index.html#)
-- MinIO Console: [http://localhost:9000](http://localhost:9000)
-  - Usuário: `admin`
-  - Senha: `admin123`
+---
 
-## 🧪 Executando Testes
-
-Para rodar os testes unitários:
+## 🥪 Executando Testes
 
 ```bash
 ./mvnw test
 ```
 
 Os testes cobrem:
-- Repositórios
-- Serviços de Cliente, Endereço, Ocorrência e Fotos
-- Upload para MinIO
-- Validações de regra de negócio
+
+- Camada de serviço
+- Repositórios (com Testcontainers)
+- Upload de imagens (mockado)
+- Regras de negócio e validações
+
+---
 
 ## 📂 Estrutura de Pastas
 
@@ -99,55 +101,58 @@ src/
 └── security
 ```
 
-## 📝 Exemplo de Uso - Registro de Ocorrência
+---
 
-```http
-POST /ocorrencias
-Authorization: Bearer <token>
-Content-Type: application/json
+## 📌 Exemplos de Uso
 
+### ➕ Registrar Ocorrência
+`POST /ocorrencias`
+
+```json
 {
   "clienteId": 1,
   "enderecoId": 1,
   "dataOcorrencia": "2025-03-20T14:00:00"
 }
 ```
-## 📝 Exemplo de Uso - Cadastro de Cliente
 
-```http
-POST /ocorrencias
-Authorization: Bearer <token>
-Content-Type: application/json
+---
 
+### ➕ Cadastrar Cliente
+`POST /clientes`
+
+```json
 {
   "nome": "Rafaela Alves",
   "cpf": "29540986764",
   "dataNascimento": "2025-03-21T00:01:50.053Z"
 }
-
 ```
-
-## 📝 Exemplo de Uso - Cadastro de Endereco
-
-```http
-POST /ocorrencias
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "logradouro": "Avenida Liberdade, 117",
-  "bairro": "Belas Vista",
-  "cep": "13770-000",
-  "cidade": "Caconde",
-  "estado": "São Paulo"
-}
-
-```
-## 🙋‍♂️ Autor
-
-Desenvolvido por Robson Ramos — 2025  
-Caso tenha dúvidas ou sugestões, entre em contato!
 
 ---
 
-⭐ Se você gostou do projeto, não esqueça de dar uma estrela no repositório!
+### ➕ Cadastrar Endereço
+`POST /enderecos`
+
+```json
+{
+  "logradouro": "Avenida Liberdade, 117",
+  "bairro": "Bela Vista",
+  "cep": "13770-000",
+  "cidade": "Caconde",
+  "estado": "SP"
+}
+```
+
+---
+
+## 🙋‍♂️ Autor
+
+Desenvolvido por **Robson Ramos** – 2025  
+Caso tenha dúvidas ou sugestões, fique à vontade para entrar em contato!
+
+---
+
+## ⭐ Contribuição
+
+Se você gostou do projeto, deixe uma ⭐ no repositório. Isso ajuda bastante!
