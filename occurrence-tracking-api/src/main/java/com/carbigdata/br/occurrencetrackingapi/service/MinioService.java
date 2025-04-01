@@ -4,7 +4,7 @@ import io.minio.GetPresignedObjectUrlArgs;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.http.Method;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,21 +13,20 @@ import java.io.InputStream;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class MinioService {
 
-    @Autowired
-    private MinioClient minioClient;
+    private final MinioClient minioClient;
 
     @Value("${minio.bucket-name}")
     private String bucketName;
 
-    @Value("${minio.url}")
-    private String minioUrl;
-
+    /**
+     * Faz o upload de um arquivo para o MinIO e retorna o caminho salvo no bucket.
+     */
     public String uploadFile(MultipartFile file, Long ocorrenciaId) {
-        try {
+        try (InputStream inputStream = file.getInputStream()) {
             String uniqueFileName = ocorrenciaId + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
-            InputStream inputStream = file.getInputStream();
 
             minioClient.putObject(
                     PutObjectArgs.builder()
@@ -38,12 +37,15 @@ public class MinioService {
                             .build()
             );
 
-            return uniqueFileName; // Retorna o caminho do arquivo salvo no bucket
+            return uniqueFileName;
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao enviar arquivo para MinIO", e);
+            throw new RuntimeException("Erro ao enviar arquivo para o MinIO", e);
         }
     }
 
+    /**
+     * Gera uma URL pública temporária para acesso ao arquivo no MinIO.
+     */
     public String getFileUrl(String filePath) {
         try {
             return minioClient.getPresignedObjectUrl(
@@ -54,7 +56,7 @@ public class MinioService {
                             .build()
             );
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao gerar URL para arquivo no MinIO", e);
+            throw new RuntimeException("Erro ao gerar URL para o arquivo no MinIO", e);
         }
     }
 }

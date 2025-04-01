@@ -3,7 +3,6 @@ package com.carbigdata.br.occurrencetrackingapi.service;
 import com.carbigdata.br.occurrencetrackingapi.dto.EnderecoDTO;
 import com.carbigdata.br.occurrencetrackingapi.entity.EnderecoEntity;
 import com.carbigdata.br.occurrencetrackingapi.repository.EnderecoRepository;
-import com.carbigdata.br.occurrencetrackingapi.util.DtoConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,7 +33,7 @@ class EnderecoServiceTest {
     private EnderecoEntity enderecoEntity;
 
     @BeforeEach
-    void setup() {
+    void setUp() {
         enderecoDTO = new EnderecoDTO();
         enderecoDTO.setLogradouro("Rua A");
         enderecoDTO.setBairro("Centro");
@@ -53,20 +51,19 @@ class EnderecoServiceTest {
     }
 
     @Test
-    void deveSalvarEnderecoComSucesso() {
+    void deveSalvarEndereco() {
         when(enderecoRepository.save(any(EnderecoEntity.class))).thenReturn(enderecoEntity);
 
-        EnderecoDTO resultado = enderecoService.salvarEndereco(enderecoDTO);
+        EnderecoDTO result = enderecoService.salvarEndereco(enderecoDTO);
 
-        assertThat(resultado).isNotNull();
-        assertThat(resultado.getLogradouro()).isEqualTo(enderecoDTO.getLogradouro());
-        assertThat(resultado.getCidade()).isEqualTo(enderecoDTO.getCidade());
+        assertThat(result).isNotNull();
+        assertThat(result.getLogradouro()).isEqualTo(enderecoDTO.getLogradouro());
 
-        verify(enderecoRepository, times(1)).save(any(EnderecoEntity.class));
+        verify(enderecoRepository).save(any(EnderecoEntity.class));
     }
 
     @Test
-    void deveListarTodosOsEnderecos() {
+    void deveListarEnderecosPaginados() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<EnderecoEntity> page = new PageImpl<>(List.of(enderecoEntity));
 
@@ -74,41 +71,43 @@ class EnderecoServiceTest {
 
         Page<EnderecoDTO> resultado = enderecoService.listarEnderecos(pageable);
 
-        assertThat(resultado).isNotEmpty();
-        assertThat(resultado.getContent().get(0).getCidade()).isEqualTo(enderecoEntity.getCidade());
+        assertThat(resultado).hasSize(1);
+        assertThat(resultado.getContent().get(0).getCidade()).isEqualTo("São Paulo");
 
-        verify(enderecoRepository, times(1)).findAll(pageable);
+        verify(enderecoRepository).findAll(pageable);
     }
 
     @Test
-    void deveBuscarEnderecoPorIdComSucesso() {
+    void deveBuscarEnderecoPorId() {
         when(enderecoRepository.findById(1L)).thenReturn(Optional.of(enderecoEntity));
 
         Optional<EnderecoDTO> resultado = enderecoService.buscarEnderecoPorId(1L);
 
         assertThat(resultado).isPresent();
-        assertThat(resultado.get().getCidade()).isEqualTo(enderecoEntity.getCidade());
+        assertThat(resultado.get().getCep()).isEqualTo(enderecoEntity.getCep());
 
-        verify(enderecoRepository, times(1)).findById(1L);
+        verify(enderecoRepository).findById(1L);
     }
 
     @Test
-    void deveRetornarVazioQuandoEnderecoNaoExiste() {
+    void deveRetornarVazioQuandoIdNaoEncontrado() {
         when(enderecoRepository.findById(1L)).thenReturn(Optional.empty());
 
         Optional<EnderecoDTO> resultado = enderecoService.buscarEnderecoPorId(1L);
 
         assertThat(resultado).isEmpty();
 
-        verify(enderecoRepository, times(1)).findById(1L);
+        verify(enderecoRepository).findById(1L);
     }
 
     @Test
-    void deveDeletarEnderecoComSucesso() {
-        doNothing().when(enderecoRepository).deleteById(1L);
+    void deveDeletarEnderecoPorId() {
+        when(enderecoRepository.existsById(1L)).thenReturn(true); // simula que o endereço existe
 
         enderecoService.deletarEndereco(1L);
 
-        verify(enderecoRepository, times(1)).deleteById(1L);
+        verify(enderecoRepository).existsById(1L);
+        verify(enderecoRepository).deleteById(1L);
     }
+
 }

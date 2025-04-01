@@ -1,5 +1,7 @@
 package com.carbigdata.br.occurrencetrackingapi.exception;
 
+import com.carbigdata.br.occurrencetrackingapi.exception.dto.ErroPadraoDTO;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -7,11 +9,36 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(RecursoNaoEncontradoException.class)
+    public ResponseEntity<ErroPadraoDTO> handleRecursoNaoEncontrado(RecursoNaoEncontradoException ex, HttpServletRequest request) {
+        ErroPadraoDTO erro = new ErroPadraoDTO(
+                Instant.now(),
+                HttpStatus.NOT_FOUND.value(),
+                "Recurso não encontrado",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(erro);
+    }
+
+    @ExceptionHandler(NegocioException.class)
+    public ResponseEntity<ErroPadraoDTO> handleNegocio(NegocioException ex, HttpServletRequest request) {
+        ErroPadraoDTO erro = new ErroPadraoDTO(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Regra de negócio violada",
+                ex.getMessage(),
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(erro);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -24,17 +51,15 @@ public class GlobalExceptionHandler {
         return ResponseEntity.badRequest().body(errors);
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<Map<String, String>> handleRuntimeExceptions(RuntimeException ex) {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
-    }
-
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGenericExceptions(Exception ex) {
-        Map<String, String> errorResponse = new HashMap<>();
-        errorResponse.put("error", "Ocorreu um erro inesperado.");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    public ResponseEntity<ErroPadraoDTO> handleGeneric(Exception ex, HttpServletRequest request) {
+        ErroPadraoDTO erro = new ErroPadraoDTO(
+                Instant.now(),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Erro inesperado",
+                "Tente novamente mais tarde.",
+                request.getRequestURI()
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(erro);
     }
 }
